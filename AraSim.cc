@@ -15,7 +15,7 @@
 #include "TFile.h"
 #include "TRandom.h"
 #include "TRandom2.h"
-#include "TRandom3.h" 
+#include "TRandom3.h"
 #include "TTree.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -76,7 +76,7 @@ string outputdir="outputs";
 // extern"C" {
 //     void model_(int *ii);
 // }
-//-------------------------------------------------- 
+//--------------------------------------------------
 
 
 //int main() {
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {   // read setup.txt file
 
 
     // below is replace by Settings class Initialize() member.
-/*    
+/*
   const int NNU=100;
 
   // NEED TO FIGURE OUT A GOOD WAY TO READ THIS IN AND STORE THEM.
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {   // read setup.txt file
   int FIXEDELEVATION=0; // fix the elevation to the thickness of ice.
   int MOOREBAY=0; //1=use Moore's Bay measured ice field attenuation length for the west land, otherwise use South Pole data
   double EXPONENT=19.; // 10^19 eV neutrinos only
-*/  
+*/
 
   Settings *settings1 = new Settings();
 
@@ -125,12 +125,12 @@ int main(int argc, char **argv) {   // read setup.txt file
       cout<<"setupfile : "<<setupfile<<endl;
   }
   if (argc > 2) { // read file!!
-     
+
       run_no = string( argv[2] );
       cout<<"run number : "<<run_no<<endl;
   }
   if (argc > 3) { // read file!!
-      
+
       outputdir = string( argv[3] );
       if(outputdir[outputdir.size()-1]=='/') outputdir=outputdir.substr(0,outputdir.size()-1); // make sure outputdir doesn't have a / at the end
       cout<<"outputdir : "<<outputdir<<endl;
@@ -178,30 +178,30 @@ int main(int argc, char **argv) {   // read setup.txt file
 
 //  IceModel *icemodel=new IceModel(ICE_MODEL + NOFZ*10,CONSTANTICETHICKNESS * 1000 + CONSTANTCRUST * 100 + FIXEDELEVATION * 10 + 0,MOOREBAY);// creates Antarctica ice model
   IceModel *icemodel=new IceModel(settings1->ICE_MODEL + settings1->NOFZ*10,settings1->CONSTANTICETHICKNESS * 1000 + settings1->CONSTANTCRUST * 100 + settings1->FIXEDELEVATION * 10 + 0,settings1->MOOREBAY);// creates Antarctica ice model
-  //IceModel inherits from EarthModel  
+  //IceModel inherits from EarthModel
 
   cout<<endl;
   cout<<"Surface at (log:0, lat:0) : "<<icemodel->Surface(0., 0.)<<endl;
   cout<<"SurfaceAboveGeoid at (log:0, lat:0) : "<<icemodel->SurfaceAboveGeoid(0., 0.)<<endl;
-  
+
   //Detector *detector=new Detector(settings1, icemodel); // builds antenna array, 0 for testbed
   Detector *detector=new Detector(settings1, icemodel, setupfile ); // builds antenna array, 0 for testbed
   cout<<"end calling detector"<<endl;
 //  Detector *detector=new Detector(settings1->DETECTOR); // builds antenna array, 0 for testbed
 
-  Trigger *trigger=new Trigger(detector, settings1); // builds the trigger  
+  Trigger *trigger=new Trigger(detector, settings1); // builds the trigger
 //  Efficiencies *efficiencies=new Efficiencies(detector->getnRx(),outputdir); // keeps track of efficiencies at each stage of the simulation
   Efficiencies *efficiencies=new Efficiencies(100,outputdir); // keeps track of efficiencies at each stage of the simulation
   cout<<"called Efficiencies"<<endl;
-  
+
   Spectra *spectra=new Spectra(settings1->EXPONENT); // gets library (or whatever) of neutrino spectra
   cout<<"called Spectra"<<endl;
 
   Ray *ray = new Ray(); // construct Ray class
   cout<<"called Ray"<<endl;
-  
 
-    // 
+
+    //
     // test PickUnbiased in IceModel.
   Counting *count1 = new Counting();
   cout<<"called Counting"<<endl;
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {   // read setup.txt file
 //--------------------------------------------------
 //   Interaction *interaction1=new Interaction("nu",primary1,settings1,whichray,count1);
 //   cout<<"called Interaction1"<<endl;
-//-------------------------------------------------- 
+//--------------------------------------------------
 
   Event *event = new Event();
   cout<<"called Event"<<endl;
@@ -426,6 +426,39 @@ double cur_posnu_z;
     int Events_Thrown = 0;
     int Events_Passed = 0;
     //       for (int inu=0;inu<settings1->NNU;inu++) { // loop over neutrinos
+    // Code to read the trigger efficiency curve for phased array
+    double snr_PA[60];
+    double eff_PA[60];
+    ifstream infile;
+    infile.open("nuphase_trig_effc.txt",ios::in);
+   if(infile.fail()) // checks to see if file opended
+    {
+      cout << "error, file could not be opened" << endl;
+      return 1; // no point continuing if the file didn't open...
+    }
+    int num = 0;
+       while(!infile.eof()) // reads file to end of *file*, not line
+      {
+         infile >> snr_PA[num]; // read first column number
+         infile >> eff_PA[num]; // read second column number
+         ++num;
+         // you can also do it on the same line like this:
+         // infile >> exam1[num] >> exam2[num] >> exam3[num]; ++num;
+      }
+      cout<<"number of data points "<<num<<endl;
+  infile.close();
+  std::cout << "The data from Phased array" << '\n';
+  for (size_t i = 0; i < num; i++) {
+    std::cout << snr_PA[i] << " "<< eff_PA[i] <<'\n';
+  }
+
+//      cout<<" Snr :"<<snr_PA[10]<<" Eff :"<<eff_PA[10]<<endl;
+
+
+
+
+
+
     while (inu < nuLimit){
 
         check_station_DC = 0;
@@ -480,7 +513,11 @@ double cur_posnu_z;
            //report->Connect_Interaction_Detector (event, detector, raysolver, signal, icemodel, settings1, trigger);
 
            //report->Connect_Interaction_Detector (event, detector, raysolver, signal, icemodel, settings1, trigger, theEvent);
-           report->Connect_Interaction_Detector (event, detector, raysolver, signal, icemodel, settings1, trigger, Events_Thrown);
+           ofstream outputFile1;
+           // char nameofOutputFile[200];
+           // sprintf(nameofOutputFile,"waveformEvent%d.txt",evt);
+           outputFile1.open("sampleWF.txt");
+           report->Connect_Interaction_Detector (event, detector, raysolver, signal, icemodel, settings1, trigger, Events_Thrown,outputFile1,snr_PA,eff_PA);
            //report->Connect_Interaction_Detector (event, detector, raysolver, signal, icemodel, settings1, trigger, theEvent, Events_Thrown);
 
 
@@ -527,13 +564,13 @@ double cur_posnu_z;
                if (report->stations[i].Global_Pass) {
 
                    cout<<"\nGlobal_Pass : "<<report->stations[i].Global_Pass<<" evt : "<<inu<<" added weight : "<<event->Nu_Interaction[0].weight<<endl;
-                   
+
                    if ( check_station_DC == 0) { // count trigger pass only once per event
-                       
+
                        Total_Global_Pass ++;
                        Total_Weight += event->Nu_Interaction[0].weight;
                        Total_Probability += event->Nu_Interaction[0].probability;
-                       
+
                        // test increment weight
                        if (settings1->INTERACTION_MODE==1) {
                            count1->incrementEventsFound( event->Nu_Interaction[0].weight, event );
@@ -544,14 +581,14 @@ double cur_posnu_z;
                        else if (settings1->INTERACTION_MODE==3) {
                            count1->incrementEventsFound( event->Nu_Interaction[0].probability, event );
                        }
-                       
-                       
+
+
                    }
-                   
+
                    check_station_DC++;
-                                      
+
                    event->inu_passed = Events_Passed;
-                   
+
 
                }
 
@@ -596,7 +633,7 @@ double cur_posnu_z;
 
        // test FILL_TREE_MODE
        if (settings1->FILL_TREE_MODE==0) { // fill event event
-           
+
            AraTree2->Fill();   //fill interaction every events
 
 #ifdef ARA_UTIL_EXISTS
@@ -616,7 +653,7 @@ double cur_posnu_z;
 #endif
        }
        else if (settings1->FILL_TREE_MODE==1) { // fill only usable posnu event
-           
+
            if (event->Nu_Interaction[0].pickposnu>0) {
                AraTree2->Fill();   //fill interaction every events
 #ifdef ARA_UTIL_EXISTS
@@ -636,7 +673,7 @@ double cur_posnu_z;
            }
        }
        else if (settings1->FILL_TREE_MODE==2) { // fill only triggered event
-           
+
            if (check_station_DC>0) {
                AraTree2->Fill();   //fill interaction every events
 #ifdef ARA_UTIL_EXISTS
@@ -657,7 +694,7 @@ double cur_posnu_z;
            }
        }
 
-       
+
        if (settings1->ONLY_PASSED_EVENTS == 1){
            if (check_station_DC > 0){
                inu++;
@@ -669,7 +706,7 @@ double cur_posnu_z;
             Events_Passed++;
         }
        Events_Thrown++;
-       
+
 
        //theEvent = NULL;
 
@@ -707,10 +744,10 @@ double cur_posnu_z;
 //    }// end trigger window loop
     TrigWind.close();
 
-                       
+
 //--------------------------------------------------
 //    cFull_window_V->Print("test_V_mimic.pdf");
-//-------------------------------------------------- 
+//--------------------------------------------------
 
 
 
@@ -734,7 +771,7 @@ double cur_posnu_z;
    cout<<"Total_Global_Pass : "<<Total_Global_Pass<<endl;
    cout<<"Total_Weight : "<<Total_Weight<<endl;
    cout<<"Total_Probability : "<<Total_Probability<<endl;
-               
+
    if (settings1->INTERACTION_MODE==1) {
        weight_file << "Total_Weight="<<Total_Weight<<endl;
    }
@@ -768,7 +805,7 @@ double cur_posnu_z;
        double error_minus = 0;
        Counting::findErrorOnSumWeights( count1->eventsfound_binned, error_plus, error_minus );
 
-       /*       
+       /*
        Veff_test = IceVolume * 4. * PI * signal->RHOICE / signal->RHOH20 * Total_Weight / (double)(settings1->NNU);
 
        // account all factors to error
@@ -827,8 +864,8 @@ double cur_posnu_z;
 
 //--------------------------------------------------
 //   cout<<"Total NNU : "<<settings1->NNU<<", PickUnbiased passed NNU : "<<nnu_pass<<endl;
-//-------------------------------------------------- 
-    
+//--------------------------------------------------
+
 
 
    // remove noisewaveform info if DATA_SAVE_MODE == 2
@@ -841,7 +878,7 @@ double cur_posnu_z;
        trigger->Vfft_noise_before.clear();
    }
 
-  
+
   AraTree->Fill();  // fill tree for one entry
 
   AraFile->Write();
@@ -851,7 +888,7 @@ double cur_posnu_z;
 
 
 
- efficiencies->summarize(); // summarize the results in an output file  
+ efficiencies->summarize(); // summarize the results in an output file
 
 
  double freq[detector->GetFreqBin()], Filter[detector->GetFreqBin()];
@@ -872,8 +909,8 @@ double cur_posnu_z;
 //--------------------------------------------------
 // int ii = 1;
 // model_(&ii);
-//-------------------------------------------------- 
- 
+//--------------------------------------------------
+
  cout<<"rmsdiode= "<<trigger->rmsdiode<<endl;
 
  delete raysolver;
@@ -893,13 +930,13 @@ double cur_posnu_z;
  cout<<"outputdir= "<<outputdir<<endl;
 
 //  Please do not delete this test line
-//  Please leave 'test(); return 0;' as the last lines in 
+//  Please leave 'test(); return 0;' as the last lines in
 //  AraSim.cc before '} //end main'
 //  These test lines are used to verify that AraSim completed properly.
 
  test();
  return 0;
-  
+
 } //end main
 
 
@@ -908,4 +945,3 @@ void test() {
 
   cout << "test is " << 0 << "\n";
 }
-

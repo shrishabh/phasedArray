@@ -58,12 +58,12 @@ Trigger::Trigger(Detector *detector, Settings *settings1) {
 
 
     if (settings1->NOISE_TEMP_MODE == 0) {
-    
+
         V_noise_freqbin = sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) );
     }
 
     else if (settings1->NOISE_TEMP_MODE == 1) {
-    
+
         for (int ch=0; ch<detector->params.number_of_antennas; ch++) {
             //V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) ) );
             V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * detector->GetTemp(0, ch, settings1) / (settings1->TIMESTEP * 2.) ) );
@@ -72,11 +72,11 @@ Trigger::Trigger(Detector *detector, Settings *settings1) {
 
     // mode 2 : make separate noise waveforms for just first 8 chs
     else if (settings1->NOISE_TEMP_MODE == 2) {
-    
+
         for (int ch=0; ch<8; ch++) {
             V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * detector->GetTemp(0, ch, settings1) / (settings1->TIMESTEP * 2.) ) );
         }
-        
+
         // total 9 array, last array for shared systemp
         V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) ) );
 
@@ -94,12 +94,12 @@ void Trigger::Reset_V_noise_freqbin(Settings *settings1, Detector *detector) {
 
 
     if (settings1->NOISE_TEMP_MODE == 0) {
-    
+
         V_noise_freqbin = sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) );
     }
 
     else if (settings1->NOISE_TEMP_MODE == 1) {
-    
+
         for (int ch=0; ch<detector->params.number_of_antennas; ch++) {
             //V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) ) );
             V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * detector->GetTemp(0, ch, settings1) / (settings1->TIMESTEP * 2.) ) );
@@ -108,11 +108,11 @@ void Trigger::Reset_V_noise_freqbin(Settings *settings1, Detector *detector) {
 
     // mode 2 : make separate noise waveforms for just first 8 chs
     else if (settings1->NOISE_TEMP_MODE == 2) {
-    
+
         for (int ch=0; ch<8; ch++) {
             V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * detector->GetTemp(0, ch, settings1) / (settings1->TIMESTEP * 2.) ) );
         }
-        
+
         // total 9 array, last array for shared systemp
         V_noise_freqbin_ch.push_back( sqrt( (double)(settings1->DATA_BIN_SIZE) * 50. * KBOLTZ * settings1->NOISE_TEMP / (settings1->TIMESTEP * 2.) ) );
 
@@ -168,7 +168,7 @@ if (settings1->NOISE_TEMP_MODE == 0) {
 	    if ( m>=(int)(maxt_diode/TIMESTEP) && m<settings1->DATA_BIN_SIZE ) {
 	    //bwslice_meandiode[j]+=timedomain_output_e[j][m]/((double)ngeneratedevents*((double)NFOUR/2-maxt_diode/TIMESTEP));
 	    meandiode+=v_noise_timedomain_diode[i][m]/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
-	    } // end loop over samples where diode function is fully contained 
+	    } // end loop over samples where diode function is fully contained
 
             v_noise_timedomain[i].push_back(v_noise[m]);    // save pure noise (not diode convlved) waveforms
 
@@ -182,7 +182,7 @@ if (settings1->NOISE_TEMP_MODE == 0) {
 
     }   // get meandiode with 1000 noisewaveforms
     cerr<< "100% done"<<endl;
-    
+
 
 
 
@@ -200,11 +200,11 @@ if (settings1->NOISE_TEMP_MODE == 0) {
 	//myconvlv(v_noise, settings1->DATA_BIN_SIZE, detector->fdiode_real,v_noise_timedomain_diode);
 
         for (int m=(int)(maxt_diode/TIMESTEP);m<settings1->DATA_BIN_SIZE;m++) {
-		
+
 	    rmsdiode+=(v_noise_timedomain_diode[i][m]-meandiode)*(v_noise_timedomain_diode[i][m]-meandiode)/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
 
 	    rmsvoltage+=(v_noise_timedomain[i][m])*(v_noise_timedomain[i][m])/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
-		
+
 	}
     }   // get rmsdiode with 1000 noisewaveforms
     cerr<< "100% done"<<endl;
@@ -298,7 +298,7 @@ for (int ch=0; ch<num_chs; ch++) {
 	    //bwslice_meandiode[j]+=timedomain_output_e[j][m]/((double)ngeneratedevents*((double)NFOUR/2-maxt_diode/TIMESTEP));
 	    meandiode_ch[ch] += v_noise_timedomain_diode_ch[ch][i][m]/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
 
-	    } // end loop over samples where diode function is fully contained 
+	    } // end loop over samples where diode function is fully contained
 
             v_noise_timedomain_ch[ch][i].push_back(v_noise[m]);    // save pure noise (not diode convlved) waveforms
 
@@ -327,17 +327,17 @@ for (int ch=0; ch<num_chs; ch++) {
 
 
         for (int m=(int)(maxt_diode/TIMESTEP);m<settings1->DATA_BIN_SIZE;m++) {
-		
+
 	    rmsdiode_ch[ch]+=(v_noise_timedomain_diode_ch[ch][i][m]-meandiode_ch[ch])*(v_noise_timedomain_diode_ch[ch][i][m]-meandiode_ch[ch])/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
 
 	    rmsvoltage_ch[ch]+=(v_noise_timedomain_ch[ch][i][m])*(v_noise_timedomain_ch[ch][i][m])/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
-		
+
 	}
     }   // get rmsdiode with 1000 noisewaveforms
 }
     cerr<< "100% done"<<endl;
 
-    
+
 
 
     cout << "From pure noise waveforms, diode responses" << "\n";
@@ -431,7 +431,7 @@ for (int ch=0; ch<num_chs; ch++) {
 	    //bwslice_meandiode[j]+=timedomain_output_e[j][m]/((double)ngeneratedevents*((double)NFOUR/2-maxt_diode/TIMESTEP));
 	    meandiode_ch[ch] += v_noise_timedomain_diode_ch[ch][i][m]/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
 
-	    } // end loop over samples where diode function is fully contained 
+	    } // end loop over samples where diode function is fully contained
 
             v_noise_timedomain_ch[ch][i].push_back(v_noise[m]);    // save pure noise (not diode convlved) waveforms
 
@@ -460,17 +460,17 @@ for (int ch=0; ch<num_chs; ch++) {
 
 
         for (int m=(int)(maxt_diode/TIMESTEP);m<settings1->DATA_BIN_SIZE;m++) {
-		
+
 	    rmsdiode_ch[ch]+=(v_noise_timedomain_diode_ch[ch][i][m]-meandiode_ch[ch])*(v_noise_timedomain_diode_ch[ch][i][m]-meandiode_ch[ch])/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
 
 	    rmsvoltage_ch[ch]+=(v_noise_timedomain_ch[ch][i][m])*(v_noise_timedomain_ch[ch][i][m])/((double)ngeneratedevents * ((double)settings1->DATA_BIN_SIZE-maxt_diode/TIMESTEP));
-		
+
 	}
     }   // get rmsdiode with 1000 noisewaveforms
 }
     cerr<< "100% done"<<endl;
 
-    
+
 
 
     cout << "From pure noise waveforms, diode responses" << "\n";
@@ -508,7 +508,7 @@ for (int ch=0; ch<num_chs; ch++) {
 
 
 }
-    
+
 
 
 void Trigger::GetNewNoiseWaveforms(Settings *settings1, Detector *detector, Report *report) {
@@ -551,7 +551,7 @@ if (settings1->TRIG_ANALYSIS_MODE != 1 ) {
 
     }   // get meandiode with 1000 noisewaveforms
 }
-    
+
 
 
 // if we are doing pure signal trigger analysis, set all noise waveform values to 0
@@ -622,7 +622,7 @@ if (settings1->TRIG_ANALYSIS_MODE != 1 ) {
     } // loop over chs
 
 }
-    
+
 
     // if we are doing pure signal trigger analysis, set all noise waveform values to 0
 else if (settings1->TRIG_ANALYSIS_MODE == 1 ) {
@@ -726,7 +726,7 @@ else if (settings1->TRIG_ANALYSIS_MODE == 1 ) {
 
 
 
-    
+
 
 
 // myconvlv in AraSim is actually different with myconvlv in icemc!!!
@@ -734,8 +734,8 @@ else if (settings1->TRIG_ANALYSIS_MODE == 1 ) {
 // moved mindiodeconvl, onediodeconvl, power_noise as I can't find their use.
 //void Trigger::myconvlv(double *data,const int NFOUR,double *fdiode,double &mindiodeconvl,double &onediodeconvl,double *power_noise,double *diodeconv) {
 void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <double> &fdiode, vector <double> &diodeconv) {
-    
-    
+
+
     const int length=DATA_BIN_SIZE;
 //    double data_copy[length];
     //double fdiode_real[length];
@@ -743,14 +743,14 @@ void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <dou
     // we are going to make double sized array for complete convolution
     double power_noise_copy[length*2];
 
-/*    
+/*
     for (int i=0;i<NFOUR/2;i++) {
 	data_copy[i]=data[i];
     }
     for (int i=NFOUR/2;i<length;i++) {
 	data_copy[i]=0.;
     }
-*/  
+*/
 
 
     // fill half of the array as power (actually energy) and another half (actually extanded part) with zero padding (Numerical Recipes 643 page)
@@ -760,16 +760,16 @@ void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <dou
     for (int i=length;i<length*2;i++) {
 	power_noise_copy[i]=0.;
     }
-    
-    
-    
+
+
+
     // do forward fft to get freq domain (energy of pure signal)
     Tools::realft(power_noise_copy,1,length*2);
-    
+
     double ans_copy[length*2];
-    
-    
-    
+
+
+
     // change the sign (from numerical recipes 648, 649 page)
     for (int j=1;j<length;j++) {
 	ans_copy[2*j]=(power_noise_copy[2*j]*fdiode[2*j]-power_noise_copy[2*j+1]*fdiode[2*j+1])/((double)length);
@@ -782,11 +782,11 @@ void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <dou
 
     // 1/length is actually 2/(length * 2)
     //
-    
+
     Tools::realft(ans_copy,-1,length*2);
-    
+
     diodeconv.clear();  // remove previous values in diodeconv
-    
+
     // only save first half of convolution result as last half is result from zero padding (and some spoiled bins)
     //for (int i=0;i<length;i++) {
     for (int i=0;i<length+maxt_diode_bin;i++) {
@@ -794,9 +794,9 @@ void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <dou
 	//diodeconv[i]=ans_copy[i];
 	diodeconv.push_back( ans_copy[i] );
     }
-    
-    
-    
+
+
+
     int iminsamp,imaxsamp; // find min and max samples such that
     // the diode response is fully overlapping with the noise waveform
     iminsamp=(int)(maxt_diode/TIMESTEP);
@@ -805,38 +805,38 @@ void Trigger::myconvlv(vector <double> &data,const int DATA_BIN_SIZE,vector <dou
     // diode response function is only partially overlappying with the
     // waveform in the convolution
     imaxsamp=NFOUR/2;
-    
+
     //  cout << "iminsamp, imaxsamp are " << iminsamp << " " << imaxsamp << "\n";
     if (imaxsamp<iminsamp) {
 	cout << "Noise waveform is not long enough for this diode response.\n";
 	exit(1);
     }
-    
+
     //int ibin=((iminsamp+imaxsamp)-(iminsamp+imaxsamp)%2)/2;
     //cout << "ibin is " << ibin << "\n";
-    
+
     // return the 50th sample, right in the middle
    // onediodeconvl=diodeconv[ibin];
-    
-    
+
+
     //mindiodeconvl=0.;
-    
+
     //for (int i=iminsamp;i<imaxsamp;i++) {
-	
+
 //	if (diodeconv[i]<mindiodeconvl)
 //	    mindiodeconvl=diodeconv[i];
-	
-	
+
+
   //  }
-    
+
 }
 
 
 
 // input data is not vector but double array
 void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdiode, vector <double> &diodeconv) {
-    
-    
+
+
     const int length=DATA_BIN_SIZE;
 //    double data_copy[length];
     //double fdiode_real[length];
@@ -844,14 +844,14 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
     // we are going to make double sized array for complete convolution
     double power_noise_copy[length*2];
 
-/*    
+/*
     for (int i=0;i<NFOUR/2;i++) {
 	data_copy[i]=data[i];
     }
     for (int i=NFOUR/2;i<length;i++) {
 	data_copy[i]=0.;
     }
-*/  
+*/
 
 
     // fill half of the array as power (actually energy) and another half (actually extanded part) with zero padding (Numerical Recipes 643 page)
@@ -861,16 +861,16 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
     for (int i=length;i<length*2;i++) {
 	power_noise_copy[i]=0.;
     }
-    
-    
-    
+
+
+
     // do forward fft to get freq domain (energy of pure signal)
     Tools::realft(power_noise_copy,1,length*2);
-    
+
     double ans_copy[length*2];
-    
-    
-    
+
+
+
     // change the sign (from numerical recipes 648, 649 page)
     for (int j=1;j<length;j++) {
 	ans_copy[2*j]=(power_noise_copy[2*j]*fdiode[2*j]-power_noise_copy[2*j+1]*fdiode[2*j+1])/((double)length);
@@ -883,11 +883,11 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
 
     // 1/length is actually 2/(length * 2)
     //
-    
+
     Tools::realft(ans_copy,-1,length*2);
-    
+
     diodeconv.clear();  // remove previous values in diodeconv
-    
+
     // only save first half of convolution result as last half is result from zero padding (and some spoiled bins)
     //for (int i=0;i<length;i++) {
     for (int i=0;i<length+maxt_diode_bin;i++) {
@@ -895,9 +895,9 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
 	//diodeconv[i]=ans_copy[i];
 	diodeconv.push_back( ans_copy[i] );
     }
-    
-    
-    
+
+
+
     int iminsamp,imaxsamp; // find min and max samples such that
     // the diode response is fully overlapping with the noise waveform
     iminsamp=(int)(maxt_diode/TIMESTEP);
@@ -906,30 +906,30 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
     // diode response function is only partially overlappying with the
     // waveform in the convolution
     imaxsamp=NFOUR/2;
-    
+
     //  cout << "iminsamp, imaxsamp are " << iminsamp << " " << imaxsamp << "\n";
     if (imaxsamp<iminsamp) {
 	cout << "Noise waveform is not long enough for this diode response.\n";
 	exit(1);
     }
-    
+
     //int ibin=((iminsamp+imaxsamp)-(iminsamp+imaxsamp)%2)/2;
     //cout << "ibin is " << ibin << "\n";
-    
+
     // return the 50th sample, right in the middle
    // onediodeconvl=diodeconv[ibin];
-    
-    
+
+
     //mindiodeconvl=0.;
-    
+
     //for (int i=iminsamp;i<imaxsamp;i++) {
-	
+
 //	if (diodeconv[i]<mindiodeconvl)
 //	    mindiodeconvl=diodeconv[i];
-	
-	
+
+
   //  }
-    
+
 }
 
 
@@ -941,35 +941,35 @@ void Trigger::myconvlv(double *data,const int DATA_BIN_SIZE,vector <double> &fdi
 
 // test for myconvlv with NFOUR/2 version
 void Trigger::myconvlv_half(vector <double> &data,const int NFOUR,vector <double> &fdiode, vector <double> &diodeconv) {
-    
-    
+
+
     const int length=NFOUR;
 //    double data_copy[length];
     //double fdiode_real[length];
     double power_noise_copy[length];
 
-/*    
+/*
     for (int i=0;i<NFOUR/2;i++) {
 	data_copy[i]=data[i];
     }
     for (int i=NFOUR/2;i<length;i++) {
 	data_copy[i]=0.;
     }
-*/  
+*/
 
 
     for (int i=0;i<length;i++) {
 	power_noise_copy[i]=(data[i]*data[i])/Zr*TIMESTEP;
     }
-    
-    
-    
+
+
+
     Tools::realft(power_noise_copy,1,length);
-    
+
     double ans_copy[length];
-    
-    
-    
+
+
+
     // change the sign (from numerical recipes 648, 649 page)
     for (int j=1;j<length/2;j++) {
 	ans_copy[2*j]=(power_noise_copy[2*j]*fdiode[2*j]-power_noise_copy[2*j+1]*fdiode[2*j+1])/((double)length/2);
@@ -979,20 +979,20 @@ void Trigger::myconvlv_half(vector <double> &data,const int NFOUR,vector <double
     }
     ans_copy[0]=power_noise_copy[0]*fdiode[0]/((double)length/2);
     ans_copy[1]=power_noise_copy[1]*fdiode[1]/((double)length/2);
-    
-    
+
+
     Tools::realft(ans_copy,-1,length);
-    
+
     diodeconv.clear();  // remove previous values in diodeconv
-    
+
     for (int i=0;i<length;i++) {
 	//power_noise[i]=power_noise_copy[i];
 	//diodeconv[i]=ans_copy[i];
 	diodeconv.push_back( ans_copy[i] );
     }
-    
-    
-    
+
+
+
     int iminsamp,imaxsamp; // find min and max samples such that
     // the diode response is fully overlapping with the noise waveform
     iminsamp=(int)(maxt_diode/TIMESTEP);
@@ -1001,64 +1001,64 @@ void Trigger::myconvlv_half(vector <double> &data,const int NFOUR,vector <double
     // diode response function is only partially overlappying with the
     // waveform in the convolution
     imaxsamp=NFOUR/2;
-    
+
     //  cout << "iminsamp, imaxsamp are " << iminsamp << " " << imaxsamp << "\n";
     if (imaxsamp<iminsamp) {
 	cout << "Noise waveform is not long enough for this diode response.\n";
 	exit(1);
     }
-    
+
     //int ibin=((iminsamp+imaxsamp)-(iminsamp+imaxsamp)%2)/2;
     //cout << "ibin is " << ibin << "\n";
-    
+
     // return the 50th sample, right in the middle
    // onediodeconvl=diodeconv[ibin];
-    
-    
+
+
     //mindiodeconvl=0.;
-    
+
     //for (int i=iminsamp;i<imaxsamp;i++) {
-	
+
 //	if (diodeconv[i]<mindiodeconvl)
 //	    mindiodeconvl=diodeconv[i];
-	
-	
+
+
   //  }
-    
+
 }
 
 
 
 void Trigger::myconvlv_half(double *data,const int NFOUR,vector <double> &fdiode, vector <double> &diodeconv) {
-    
-    
+
+
     const int length=NFOUR;
 //    double data_copy[length];
     //double fdiode_real[length];
     double power_noise_copy[length];
-  
-/*    
+
+/*
     for (int i=0;i<NFOUR/2;i++) {
 	data_copy[i]=data[i];
     }
     for (int i=NFOUR/2;i<length;i++) {
 	data_copy[i]=0.;
     }
-*/  
+*/
 
 
     for (int i=0;i<length;i++) {
 	power_noise_copy[i]=(data[i]*data[i])/Zr*TIMESTEP;
     }
-    
-    
-    
+
+
+
     Tools::realft(power_noise_copy,1,length);
-    
+
     double ans_copy[length];
-    
-    
-    
+
+
+
     for (int j=1;j<length/2;j++) {
 	ans_copy[2*j]=(power_noise_copy[2*j]*fdiode[2*j]-power_noise_copy[2*j+1]*fdiode[2*j+1])/((double)length/2);
 	//ans_copy[2*j]=(power_noise_copy[2*j]*fdiode[2*j]+power_noise_copy[2*j+1]*fdiode[2*j+1])/((double)length/2);
@@ -1067,20 +1067,20 @@ void Trigger::myconvlv_half(double *data,const int NFOUR,vector <double> &fdiode
     }
     ans_copy[0]=power_noise_copy[0]*fdiode[0]/((double)length/2);
     ans_copy[1]=power_noise_copy[1]*fdiode[1]/((double)length/2);
-    
-    
+
+
     Tools::realft(ans_copy,-1,length);
-    
+
     diodeconv.clear();  // remove previous values in diodeconv
-    
+
     for (int i=0;i<length;i++) {
 	//power_noise[i]=power_noise_copy[i];
 	//diodeconv[i]=ans_copy[i];
 	diodeconv.push_back( ans_copy[i] );
     }
-    
-    
-    
+
+
+
     int iminsamp,imaxsamp; // find min and max samples such that
     // the diode response is fully overlapping with the noise waveform
     iminsamp=(int)(maxt_diode/TIMESTEP);
@@ -1089,30 +1089,30 @@ void Trigger::myconvlv_half(double *data,const int NFOUR,vector <double> &fdiode
     // diode response function is only partially overlappying with the
     // waveform in the convolution
     imaxsamp=NFOUR/2;
-    
+
     //  cout << "iminsamp, imaxsamp are " << iminsamp << " " << imaxsamp << "\n";
     if (imaxsamp<iminsamp) {
 	cout << "Noise waveform is not long enough for this diode response.\n";
 	exit(1);
     }
-    
+
     //int ibin=((iminsamp+imaxsamp)-(iminsamp+imaxsamp)%2)/2;
     //cout << "ibin is " << ibin << "\n";
-    
+
     // return the 50th sample, right in the middle
    // onediodeconvl=diodeconv[ibin];
-    
-    
+
+
     //mindiodeconvl=0.;
-    
+
     //for (int i=iminsamp;i<imaxsamp;i++) {
-	
+
 //	if (diodeconv[i]<mindiodeconvl)
 //	    mindiodeconvl=diodeconv[i];
-	
-	
+
+
   //  }
-    
+
 }
 
 
@@ -1135,7 +1135,7 @@ int Trigger::CheckChannelsPass( vector <double> &V_total_diode ) {
 
     return ch_pass_bin; // if there was any iwindow values pass the threshold, return = bin number where passed the trigger, if nothing, return = 0;
 
-    
+
 }
 
 
@@ -1145,5 +1145,3 @@ int Trigger::CheckChannelsPass( vector <double> &V_total_diode ) {
 //Trigger::~Trigger() {
 
 //}
-  
-

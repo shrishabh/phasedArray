@@ -29,6 +29,8 @@ SECONDARIES=0
 RANDOM_MODE=0
 SEED=100
 
+TRIG_SCAN_MODE=5
+
 // below settings are available for only TestBed mode (DETECTOR=3 case)
 TRIG_ONLY_BH_ON=0
 CALPULSER_ON=0
