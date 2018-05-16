@@ -15,7 +15,7 @@
 #include "TFile.h"
 #include "TRandom.h"
 #include "TRandom2.h"
-#include "TRandom3.h" 
+#include "TRandom3.h"
 #include "TTree.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
 
   //  Detector *detector=new Detector(settings->DETECTOR); // builds antenna array, 0 for testbed
 //  Detector *detector=0; // builds antenna array, 0 for testbed
-  Detector *detector = 0; 
+  Detector *detector = 0;
   Settings *settings = 0;
   Spectra *spectra = 0;
   IceModel *icemodel = 0;
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
   Trigger *trigger = 0;
   cout<<"construct detector"<<endl;
 
-  
+
   TFile *AraFile=new TFile(( readfile ).c_str());
   //TFile *AraFile=new TFile((outputdir+"/AraOut.root").c_str());
   cout<<"AraFile"<<endl;
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
   AraTree2->SetBranchAddress("event",&event);
   AraTree2->SetBranchAddress("report",&report);
   cout<<"branch detector"<<endl;
-  
+
   AraTree->GetEvent(0);
   cout<<"getevent"<<endl;
   cout << "I'm here.\n";
@@ -197,8 +197,8 @@ cout<<"total number of strings : "<<(int)detector->params.number_of_strings<<end
 cout<<"total number of antennas : "<<(int)detector->params.number_of_antennas<<endl;
 
 
-TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,4800,700);
-c1->Divide(6,1);
+TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,1000,800);
+// c1->Divide(6,1);
 
 double x[(int)detector->params.number_of_stations], y[(int)detector->params.number_of_stations];
 
@@ -206,23 +206,23 @@ for (int i=0;i<(int)detector->params.number_of_stations;i++) {
     x[i] = (double)detector->stations[i].GetX();
     y[i] = (double)detector->stations[i].GetY();
 }
-
-TGraph *gr;
-gr = new TGraph((int)detector->params.number_of_stations,x,y);
-
-c1->cd(1);
-gr->SetTitle("ARA station layout");
-gr->GetHistogram()->SetMaximum(detector->params.core_y + settings->POSNU_RADIUS);
-gr->GetHistogram()->SetMinimum(detector->params.core_y - settings->POSNU_RADIUS);
-gr->GetHistogram()->SetXTitle("X (m)");
-gr->GetHistogram()->SetYTitle("Y (m)");
-gr->GetYaxis()->SetTitleOffset(1.2);
-gr->GetHistogram()->SetYTitle("Y (m)");
-gr->GetXaxis()->SetLimits(detector->params.core_x- settings->POSNU_RADIUS, detector->params.core_x+ settings->POSNU_RADIUS);
-gr->Draw("a*");
-
-
-c1->cd(2);
+//
+// TGraph *gr;
+// gr = new TGraph((int)detector->params.number_of_stations,x,y);
+//
+// c1->cd(1);
+// gr->SetTitle("ARA station layout");
+// gr->GetHistogram()->SetMaximum(detector->params.core_y + settings->POSNU_RADIUS);
+// gr->GetHistogram()->SetMinimum(detector->params.core_y - settings->POSNU_RADIUS);
+// gr->GetHistogram()->SetXTitle("X (m)");
+// gr->GetHistogram()->SetYTitle("Y (m)");
+// gr->GetYaxis()->SetTitleOffset(1.2);
+// gr->GetHistogram()->SetYTitle("Y (m)");
+// gr->GetXaxis()->SetLimits(detector->params.core_x- settings->POSNU_RADIUS, detector->params.core_x+ settings->POSNU_RADIUS);
+// gr->Draw("a*");
+//
+//
+// c1->cd(2);
 
 int station_choice = 0;
 
@@ -242,41 +242,41 @@ for (int i=0;i< detector->params.number_of_surfaces_station;i++) {
 }
 
 
-TGraph *gr_string;
-//gr_string = new TGraph(4,string_x,string_y);
-gr_string = new TGraph(detector->params.number_of_strings_station,string_x,string_y);
+// TGraph *gr_string;
+// //gr_string = new TGraph(4,string_x,string_y);
+// gr_string = new TGraph(detector->params.number_of_strings_station,string_x,string_y);
+//
+// gr_string->SetTitle("Strings and surface antennas layout for each station");
+// //gr_string->GetHistogram()->SetMaximum(5300);
+// //gr_string->GetHistogram()->SetMinimum(5100);
+// //gr_string->GetXaxis()->SetLimits(-3100,-2900);
+// gr_string->GetHistogram()->SetMaximum( (int)detector->stations[station_choice].GetY() + 100);
+// gr_string->GetHistogram()->SetMinimum( (int)detector->stations[station_choice].GetY() - 100);
+// gr_string->GetXaxis()->SetLimits( (int)detector->stations[station_choice].GetX() - 100, (int)detector->stations[station_choice].GetX() + 100 );
+// gr_string->SetMarkerColor(4);
+// gr_string->SetMarkerSize(2);
+// gr_string->SetMarkerStyle(20);
+// gr_string->GetHistogram()->SetXTitle("X (m)");
+// gr_string->GetHistogram()->SetYTitle("Y (m)");
+// gr_string->GetYaxis()->SetTitleOffset(1.2);
+// gr_string->Draw("ap");
 
-gr_string->SetTitle("Strings and surface antennas layout for each station");
-//gr_string->GetHistogram()->SetMaximum(5300);
-//gr_string->GetHistogram()->SetMinimum(5100);
-//gr_string->GetXaxis()->SetLimits(-3100,-2900);
-gr_string->GetHistogram()->SetMaximum( (int)detector->stations[station_choice].GetY() + 100);
-gr_string->GetHistogram()->SetMinimum( (int)detector->stations[station_choice].GetY() - 100);
-gr_string->GetXaxis()->SetLimits( (int)detector->stations[station_choice].GetX() - 100, (int)detector->stations[station_choice].GetX() + 100 );
-gr_string->SetMarkerColor(4);
-gr_string->SetMarkerSize(2);
-gr_string->SetMarkerStyle(20);
-gr_string->GetHistogram()->SetXTitle("X (m)");
-gr_string->GetHistogram()->SetYTitle("Y (m)");
-gr_string->GetYaxis()->SetTitleOffset(1.2);
-gr_string->Draw("ap");
-
-TGraph *gr_surface;
-gr_surface = new TGraph(detector->params.number_of_surfaces_station,surface_x,surface_y);
-gr_surface->SetMarkerColor(2);
-gr_surface->SetMarkerSize(2);
-gr_surface->SetMarkerStyle(21);
-gr_surface->Draw("p");
-
-
-TLegend *Leg_string_surface = new TLegend(1., 0.95, 0.5,0.8);
-Leg_string_surface -> AddEntry(gr_string, "Strings");
-Leg_string_surface -> AddEntry(gr_surface, "Surface antennas");
-Leg_string_surface -> Draw();
-
-
-
-c1->cd(3);
+// TGraph *gr_surface;
+// gr_surface = new TGraph(detector->params.number_of_surfaces_station,surface_x,surface_y);
+// gr_surface->SetMarkerColor(2);
+// gr_surface->SetMarkerSize(2);
+// gr_surface->SetMarkerStyle(21);
+// gr_surface->Draw("p");
+//
+//
+// TLegend *Leg_string_surface = new TLegend(1., 0.95, 0.5,0.8);
+// Leg_string_surface -> AddEntry(gr_string, "Strings");
+// Leg_string_surface -> AddEntry(gr_surface, "Surface antennas");
+// Leg_string_surface -> Draw();
+//
+//
+//
+// c1->cd(3);
 
 int string_choice = 0;
 //int station_choice = (int)detector->params.number_of_stations - 1;
@@ -465,7 +465,7 @@ Leg_borehole -> Draw();
 //Leg_top_bot -> AddEntry(gr_bot, "Bedrock");
 //Leg_top_bot -> Draw();
 
-c1->Print("ARA-37_station_layout.pdf");
+c1->Print("PAStringLayout.pdf");
 
 
 
@@ -516,7 +516,7 @@ cout<<"Flux at 19 is : "<<spectra->GetEdNdEdAdt(E)<<endl;
 //--------------------------------------------------
 // TSpline3 *sp1;
 // sp1 = spectra->GetSEdNdEdAdt();
-//-------------------------------------------------- 
+//--------------------------------------------------
 
 ///////////////////////////////////////////////////
 

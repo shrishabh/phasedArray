@@ -167,10 +167,12 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
   int nnu_pass = 0; // number of nu events which passed PickUnbiased.
   double posnuX;
   double posnuY;
-  double posnuZ;
-  double posnuR;
+  double posnuZ[settings->NNU];
+  double posnuR[settings->NNU];
   double posnuTheta;
   double posnuPhi;
+
+  double radius[settings->NNU];
 
   double dirnuX;
   double dirnuY;
@@ -179,6 +181,10 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
   double dirnuTheta;
   double dirnuPhi;
 
+  double hpol[7][settings->NNU];
+  double vpol[7][settings->NNU];
+
+  int numEvents = settings->NNU;
   string current;
 
   vector <double> vmmhz1m;
@@ -209,8 +215,9 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
 
   int bin = settings->NFOUR/2;
   double wf_time_offset = -450.;// in ns
-
-
+  double offSet = (double)detector->stations[0].strings[0].antennas[0].GetZ() - 20.0;
+  cout<<"OffSet = "<<offSet<<endl;
+  double hpolTemp1; double hpolTemp2; double vpolTemp;
   if ( settings->DETECTOR != 0 ) {
 
 
@@ -225,8 +232,8 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
               //The position of all the events
               posnuX = event->Nu_Interaction[0].posnu.GetX();
               posnuY = event->Nu_Interaction[0].posnu.GetY();
-              posnuZ = event->Nu_Interaction[0].posnu.GetZ();
-              posnuR = event->Nu_Interaction[0].posnu.R();
+              posnuZ[nnu_pass] = event->Nu_Interaction[0].posnu.GetZ() - offSet;
+              posnuR[nnu_pass] = event->Nu_Interaction[0].posnu.R();
               posnuTheta = event->Nu_Interaction[0].posnu.Theta();
               posnuPhi = event->Nu_Interaction[0].posnu.Phi();
 
@@ -245,27 +252,35 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
 
               emfrac = event->Nu_Interaction[0].emfrac;
               hadfrac = event->Nu_Interaction[0].hadfrac;
-
+              radius[nnu_pass] = report->stations[0].strings[0].antennas[0].Dist[0];
               //signalBin = report->signal_bin;
               current = event->Nu_Interaction[0].current;
-              outputFile<<"Event Number "<<nnu_pass<<endl;
-
-              outputFile<<"Position (Cartesian) (X,Y,Z) :"<<posnuX<<", "<<posnuY<<", "<<posnuZ<<endl;
-              outputFile<<"Position (Spherical) (R, Theta, Phi) :"<<posnuR<<" "<<posnuTheta<<" "<<posnuPhi<<endl;
-              outputFile<<"Direction (Cartesian)  :"<<dirnuX<<", "<<dirnuY<<", "<<dirnuZ<<endl;
-              outputFile<<"Position (Spherical)  :"<<dirnuR<<" "<<dirnuTheta<<" "<<dirnuPhi<<endl;
-              outputFile<<"Em frac : "<<emfrac<<" Hadronic frac : "<<hadfrac<<endl;
-              outputFile<<"Type of Interaction "<<current;
-              outputFile<<endl;
-              outputFile<<" Waveforms - without Diode Convolution"<<endl;
-              for (int i = 0; i < 4; i++){
-                for (int j = 0; j < 4; j++){
-                  for (int l=0; l<bin; l++) {
-                    outputFile<<report->stations[0].strings[i].antennas[j].V_mimic[l]<<" ";
-                  }
-                }
+              for(int i = 0; i < 7; i++){
+                vpolTemp = report->stations[0].strings[0].antennas[i].Pol_vector[3].GetZ();
+                hpolTemp1 = report->stations[0].strings[0].antennas[i].Pol_vector[3].GetY();
+                hpolTemp2 = report->stations[0].strings[0].antennas[i].Pol_vector[3].GetX();
+                hpol[i][nnu_pass] = sqrt((hpolTemp1*hpolTemp1) + (hpolTemp2*hpolTemp2));
+                vpol[i][nnu_pass] = vpolTemp;
+                cout<<"Vpol : "<<vpolTemp<<" Hpol : "<<hpol[i][nnu_pass]<<"Total Magnitude : "<<sqrt((vpolTemp*vpolTemp) + (hpol[i][nnu_pass]*hpol[i][nnu_pass]))<<endl;
               }
-              outputFile<<endl;
+              // outputFile<<"Event Number "<<nnu_pass<<endl;
+              //
+              // outputFile<<"Position (Cartesian) (X,Y,Z) :"<<posnuX<<", "<<posnuY<<", "<<posnuZ<<endl;
+              // outputFile<<"Position (Spherical) (R, Theta, Phi) :"<<posnuR<<" "<<posnuTheta<<" "<<posnuPhi<<endl;
+              // outputFile<<"Direction (Cartesian)  :"<<dirnuX<<", "<<dirnuY<<", "<<dirnuZ<<endl;
+              // outputFile<<"Position (Spherical)  :"<<dirnuR<<" "<<dirnuTheta<<" "<<dirnuPhi<<endl;
+              // outputFile<<"Em frac : "<<emfrac<<" Hadronic frac : "<<hadfrac<<endl;
+              // outputFile<<"Type of Interaction "<<current;
+              // outputFile<<endl;
+              // outputFile<<" Waveforms - without Diode Convolution"<<endl;
+              // for (int i = 0; i < 4; i++){
+              //   for (int j = 0; j < 4; j++){
+              //     for (int l=0; l<bin; l++) {
+              //       outputFile<<report->stations[0].strings[i].antennas[j].V_mimic[l]<<" ";
+              //     }
+              //   }
+              // }
+              // outputFile<<endl;
 
 
 
@@ -279,6 +294,24 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
 
 
   }
+  TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,1000,800);
+  TGraph *gr_radiusDepth;
+  gr_radiusDepth = new TGraph(numEvents,radius,posnuZ);
+  gr_radiusDepth->SetTitle("Radius vs Depth for triggered Events");
+  //gr_string->GetHistogram()->SetMaximum(5300);
+  //gr_string->GetHistogram()->SetMinimum(5100);
+  //gr_string->GetXaxis()->SetLimits(-3100,-2900);
+  //gr_radiusDepth->GetHistogram()->SetMaximum( (int)detector->stations[station_choice].strings[string_choice].GetZ() );
+  //gr_radiusDepth->GetHistogram()->SetMaximum(200);
+  //gr_radiusDepth->GetHistogram()->SetMinimum( 170);
+  //gr_radiusDepth->GetXaxis()->SetLimits( (int)detector->stations[station_choice].GetX() - 100, (int)detector->stations[station_choice].GetX() + 100 );
+  gr_radiusDepth->GetYaxis()->SetTitle("Z (depth, m)");
+  gr_radiusDepth->SetMarkerColor(4);
+  gr_radiusDepth->SetMarkerSize(0.5);
+  gr_radiusDepth->SetMarkerStyle(20);
+  gr_radiusDepth->GetHistogram()->SetXTitle("Radius (m)");
+  gr_radiusDepth->GetYaxis()->SetTitleOffset(1.2);
+  gr_radiusDepth->Draw("ap");
 
-
+  c1->Print("PAradiusDepth.pdf");
 }
