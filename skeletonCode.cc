@@ -302,8 +302,8 @@ int main(int argc, char **argv) {    // this is for manual power threshold value
   //gr_string->GetHistogram()->SetMinimum(5100);
   //gr_string->GetXaxis()->SetLimits(-3100,-2900);
   //gr_radiusDepth->GetHistogram()->SetMaximum( (int)detector->stations[station_choice].strings[string_choice].GetZ() );
-  //gr_radiusDepth->GetHistogram()->SetMaximum(200);
-  //gr_radiusDepth->GetHistogram()->SetMinimum( 170);
+  gr_radiusDepth->GetHistogram()->SetMaximum(8000);
+  gr_radiusDepth->GetHistogram()->SetMinimum(0);
   //gr_radiusDepth->GetXaxis()->SetLimits( (int)detector->stations[station_choice].GetX() - 100, (int)detector->stations[station_choice].GetX() + 100 );
   gr_radiusDepth->GetYaxis()->SetTitle("Z (depth, m)");
   gr_radiusDepth->SetMarkerColor(4);
