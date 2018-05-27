@@ -285,15 +285,21 @@ double antenna_x_V[8], antenna_y_V[8];   // use x as x, y as z to see the depth 
 double antenna_x_H[8], antenna_y_H[8];   // use x as x, y as z to see the depth layout
 int V_pol_num = 0;
 int H_pol_num = 0;
-    double offSet = (double)detector->stations[station_choice].strings[string_choice].antennas[0].GetZ();
-
+    double offSet = (double)detector->stations[0].GetZ();
+    cout<<"Off set "<<offSet<<endl;
 //for (int i=0;i<4;i++) {
+cout<<"Depth of antenna "<<" "<<(long)detector->stations[0].strings[0].antennas[0].GetZ()<<endl;
+cout<<"Depth of antenna "<<" "<<(long)detector->stations[0].strings[0].antennas[1].GetZ()<<endl;
+cout<<"Depth of antenna "<<" "<<(long)detector->stations[0].strings[0].antennas[5].GetZ()<<endl;
+cout<<"Depth of antenna "<<" "<<(long)detector->stations[0].strings[0].antennas[6].GetZ()<<endl;
+cout<<"Depth of string "<<" "<<(long)detector->stations[0].strings[0].GetZ()<<endl;
+cout<<"Depth of station "<<" "<<(long)detector->stations[0].GetZ()<<endl;
 for (int i=0;i<detector->params.number_of_antennas_string;i++) {
     //antenna_x[i] = (double)detector->stations[station_choice].strings[string_choice].GetX();
 
     if (detector->stations[station_choice].strings[string_choice].antennas[i].type == 0) { // Vpol
     antenna_x_V[V_pol_num] = (double)detector->stations[station_choice].strings[string_choice].antennas[i].GetX() ;
-    antenna_y_V[V_pol_num] = (double)detector->stations[station_choice].strings[string_choice].antennas[i].GetZ() - offSet + 180;
+    antenna_y_V[V_pol_num] = (double)detector->stations[station_choice].strings[string_choice].antennas[i].GetZ() - offSet ;
     cout<<"Depth of antenna "<<i<<" "<<antenna_y_V[i]<<endl;
     V_pol_num++;
     }
@@ -490,7 +496,7 @@ for (int i=0;i<spectra->GetE_bin();i++) {
     cout<<"energy bin "<<i<<" : "<<spectra->energy[i]<<endl;
 }
 
-cout<<"IceModel R_EARTH : "<<icemodel->R_EARTH<<endl;
+cout<<"IceModel R_EARTH : "<<(long)icemodel->R_EARTH<<endl;
 
 /////////////////////////////////////////////
 

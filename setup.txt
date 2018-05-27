@@ -4,13 +4,13 @@
 NFOUR=2048
 
 
-EXPONENT=19
+EXPONENT=20
 NNU=10 // number of neutrino events
-NNU_PASSED=1 // number of neutrino events that are allowed to pass the trigger
-ONLY_PASSED_EVENTS=0 // 0 (default): AraSim throws NNU events whether or not they pass; 1: AraSim throws events until the number of events that pass the trigger is equal to NNU_PASSED (WARNING: may cause long run times if reasonable values are not chosen)
+NNU_PASSED=2 // number of neutrino events that are allowed to pass the trigger
+ONLY_PASSED_EVENTS=1 // 0 (default): AraSim throws NNU events whether or not they pass; 1: AraSim throws events until the number of events that pass the trigger is equal to NNU_PASSED (WARNING: may cause long run times if reasonable values are not chosen)
 NOISE_WAVEFORM_GENERATE_MODE=0 // generate new noise waveforms for each events
 NOISE_EVENTS=100 // number of pure noise waveforms
-TRIG_ANALYSIS_MODE=0 // 0 = signal + noise, 1 = signal only, 2 = noise only
+TRIG_ANALYSIS_MODE=1 // 0 = signal + noise, 1 = signal only, 2 = noise only
 DETECTOR=1 // ARA stations 1 to 7
 NOFZ=1
 
@@ -53,12 +53,12 @@ z_max=180
 
 
 BH_ANT_SEP_DIST_ON=1 // default 0 : use constant borehole antenna distance. 1 : use separate antenna distance. use z_btw01, z_btw12, ... in ARA_N_info.txt or ARA37_info.txt
-z_btw01=1.0
-z_btw12=1.0
+z_btw01=2.0
+z_btw12=2.0
 z_btw23=1.0
 z_btw34=1.0
-z_btw45=2.0
-z_btw56=2.0
+z_btw45=1.0
+z_btw56=1.0
 TRIG_MODE=1 // use vpol, hpol separated trigger mode. by default N_TRIG_V=3, N_TRIG_H=3. You can change this values
 N_TRIG_V=5
 N_TRIG_H=5

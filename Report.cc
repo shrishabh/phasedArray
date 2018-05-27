@@ -165,6 +165,8 @@ void Antenna_r::clear() {   // if any vector variable added in Antenna_r, need t
     time.clear();
     time_mimic.clear();
     V_mimic.clear();
+    waveformVoltage.clear();
+
     Ax.clear();
     Ay.clear();
     Az.clear();
@@ -268,6 +270,7 @@ void Antenna_r::clear_useless(Settings *settings1) {   // to reduce the size of 
     time.clear();
     time_mimic.clear();
     V_mimic.clear();
+    waveformVoltage.clear();
 
 
     // additional for before ant waveform
@@ -314,7 +317,7 @@ void Report::clear_useless(Settings *settings1) {   // to reduce the size of out
 //void Report::Connect_Interaction_Detector (Event *event, Detector *detector, RaySolver *raysolver, Signal *signal, IceModel *icemodel, Settings *settings1, Trigger *trigger, UsefulIcrrStationEvent *theUsefulEvent, int evt) {
 void Report::Connect_Interaction_Detector (Event *event, Detector *detector, RaySolver *raysolver, Signal *signal, IceModel *icemodel, Settings *settings1, Trigger *trigger, int evt, ofstream& outputFile1, double* xdata, double* ydata) {
 
-    cout<<"In the connect Interaction Detector function"<<endl;
+    //cout<<"In the connect Interaction Detector function"<<endl;
     int ray_sol_cnt;
     double viewangle;
     Position launch_vector; // direction of ray at the source
@@ -1870,27 +1873,84 @@ void Report::Connect_Interaction_Detector (Event *event, Detector *detector, Ray
               //cout<<"In the desired trigger mode"<<endl;
               noise_rms = 0.04; //The noise RMS for an ARA waveform
               double avgSnr = getAverageSNR(trigger, detector, noise_rms, signalbinPA, BINSIZE);
+              //The code below is just for testing purposes
+              //int bin_value;
+              //cout<<"Signal Bin in the function = "<<signalbinPA<<endl;
+              //int numAnt = detector->stations[0].strings[0].antennas.size();
+              // double snr = 0.0;
+              // for (size_t ant = 0; ant < numAnt; ant++) {
+              //   double peak = 0.0;
+              //   for (int bin=0; bin<BINSIZE; bin++) {   //BINSIZE should be NFOUR/2
+              //       bin_value = signalbinPA - BINSIZE/2 + bin;
+              //       if (TMath::Abs(trigger->Full_window_V[ant][bin_value]) > peak) {
+              //         peak = TMath::Abs(trigger->Full_window_V[ant][bin_value]);
+              //       }
+              //   }
+              //   snr = snr + 1.0*peak/noise_rms;
+              //   cout<<"Peak Value = "<<peak<<endl;
+              // }
+              // avgSnr = snr*1.0/numAnt;
+              //test code ends here, comment the section above when you are done testing
               double eff = interpolate(xdata,ydata,avgSnr,59);
               if(avgSnr > 1){
+                cout<<endl;
                 cout<<"Noise RMS :"<<noise_rms<<" avgSNR :"<<avgSnr<<" Efficiency "<<eff<<endl;
                 cout<<"************************"<<endl;
 
               }
               if(isTrigger(eff)){
                  cout<<"This is a trigger with raySolNum as "<< raySolNum<<" ******************************"<<endl;
+                 cout<<" avgSNR For Triggered Events :"<<avgSnr<<" Event Number : "<<evt<<endl;
+                 stations[i].strings[0].averageSNR = avgSnr;
                  last_trig_bin = signalbinPA;
+                 //cout<<"Signal Bin ****"<<signalbinPA<<"BIN SIZE "<<BINSIZE<<endl;
                  stations[i].Global_Pass = last_trig_bin;
               for (size_t str = 0; str < detector->stations[i].strings.size(); str++) {
-                for (size_t ant = 0; ant < detector->stations[i].strings[str].antennas.size(); ant++) {
-                 for (int mimicbin=0; mimicbin<settings1->NFOUR/2; mimicbin++) {
-                     if (V_mimic_mode == 0) { // Global passed bin is the center of the window
-                         stations[i].strings[str].antennas[ant].V_mimic.push_back( ( trigger->Full_window_V[ant][ last_trig_bin - settings1->NFOUR/4 + mimicbin ] )*1.e3 );// save in mV
-                         stations[i].strings[str].antennas[ant].time.push_back( last_trig_bin - settings1->NFOUR/4 + mimicbin );
-                         stations[i].strings[str].antennas[ant].time_mimic.push_back( ( settings1->NFOUR/4 + mimicbin) * settings1->TIMESTEP*1.e9 );// save in ns
+                for (size_t ant = 0; ant < detector->stations[i].strings[0].antennas.size(); ant++) {
+                  double peakvalue = 0;
+                 for (int bin=0; bin<BINSIZE; bin++) {
+                     //if (V_mimic_mode == 0) { // Global passed bin is the center of the window
+                        bin_value = signalbinPA - BINSIZE/2 + bin;
+                         // stations[i].strings[str].antennas[ant].V_mimic.push_back( ( trigger->Full_window_V[ant][ last_trig_bin - settings1->NFOUR/4 + mimicbin ] )*1.e3 );// save in mV
+                         // stations[i].strings[str].antennas[ant].time.push_back( last_trig_bin - settings1->NFOUR/4 + mimicbin );
+                         // stations[i].strings[str].antennas[ant].time_mimic.push_back( ( settings1->NFOUR/4 + mimicbin) * settings1->TIMESTEP*1.e9 );// save in ns
+                         stations[i].strings[0].antennas[ant].V_mimic.push_back(trigger->Full_window_V[ant][bin_value]);// save in mV
+                         // stations[i].strings[0].antennas[ant].time.push_back( bin_value );
+                         // stations[i].strings[0].antennas[ant].time_mimic.push_back( ( BINSIZE/2 + bin) * settings1->TIMESTEP*1.e9 );// save in ns
+                         stations[i].strings[0].antennas[ant].waveformVoltage.push_back(trigger->Full_window_V[ant][bin_value]);// save in mV
+                         stations[i].strings[0].antennas[ant].time.push_back( bin_value );
+                         stations[i].strings[0].antennas[ant].time_mimic.push_back( ( BINSIZE/2 + bin) * settings1->TIMESTEP*1.e9 );// save in ns
+                         if (TMath::Abs(trigger->Full_window_V[ant][bin_value]) > peakvalue) {
+                               peakvalue = TMath::Abs(trigger->Full_window_V[ant][bin_value]);
+                             }
                      }
                    }
+
+                   // double peakvalue = 0.0;
+                   // for (int bin=0; bin<BINSIZE; bin++) {   //BINSIZE should be NFOUR/2
+                   //     bin_value = signalbinPA - BINSIZE/2 + bin;
+                   //     stations[i].strings[0].antennas[ant].V_mimic.push_back( ( trigger->Full_window_V[ant][bin_value] )*1.e3 );// save in mV
+                   //     stations[i].strings[0].antennas[ant].time.push_back( bin_value );
+                   //     stations[i].strings[0].antennas[ant].time_mimic.push_back( ( BINSIZE/2 + bin) * settings1->TIMESTEP*1.e9 );// save in ns
+                   //     if (TMath::Abs(trigger->Full_window_V[ant][bin_value]) > peakvalue) {
+                   //       peakvalue = TMath::Abs(trigger->Full_window_V[ant][bin_value]);
+                   //     }
+                   // }
+                   //cout<<"Peak Value while storing "<<peakvalue<<endl;
                  }
-               }
+               //}
+
+               // for (size_t ant = 0; ant < numAnt; ant++) {
+               //   double peak = 0.0;
+               //   for (int bin=0; bin<BINSIZE; bin++) {   //BINSIZE should be NFOUR/2
+               //       bin_value = signalbinPA - BINSIZE/2 + bin;
+               //       if (TMath::Abs(trigger->Full_window_V[ant][bin_value]) > peak) {
+               //         peak = TMath::Abs(trigger->Full_window_V[ant][bin_value]);
+               //       }
+               //   }
+               //   //snr = snr + 1.0*peak/noise_rms;
+               //   cout<<"Peak Value in the after everything "<<peak<<endl;
+               // }
 
                 //if (avgSnr > 2.5){
               //    cout<<"This is a reasonable signal"<<endl;
@@ -1909,6 +1969,7 @@ void Report::Connect_Interaction_Detector (Event *event, Detector *detector, Ray
                 }
               raySolNum++;
               if(searchSecondRay == false) break;
+              //if(stations[i].Global_Pass > 0) break;
             }
 
         }
@@ -2483,6 +2544,7 @@ double Report::interpolate(double *xdata,double *ydata, double xi, int numData)
 
 double Report::getAverageSNR(Trigger *trigger, Detector *detector, double noise_rms, int signalBin, int BINSIZE){
   int bin_value;
+  //cout<<"Signal Bin in the function = "<<signalBin<<endl;
   int numAnt = detector->stations[0].strings[0].antennas.size();
   double snr = 0.0;
   for (size_t ant = 0; ant < numAnt; ant++) {
@@ -2493,9 +2555,8 @@ double Report::getAverageSNR(Trigger *trigger, Detector *detector, double noise_
           peak = TMath::Abs(trigger->Full_window_V[ant][bin_value]);
         }
     }
-    snr = snr + 1.0*
-    peak/noise_rms;
-
+    snr = snr + 1.0*peak/noise_rms;
+    //cout<<"Peak Value = "<<peak<<endl;
   }
   return snr*1.0/numAnt;
 }

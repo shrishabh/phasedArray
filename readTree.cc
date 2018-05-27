@@ -15,7 +15,7 @@
 #include "TFile.h"
 #include "TRandom.h"
 #include "TRandom2.h"
-#include "TRandom3.h" 
+#include "TRandom3.h"
 #include "TTree.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -112,14 +112,14 @@ chain.GetEntry(0);
 
   //  Detector *detector=new Detector(settings->DETECTOR); // builds antenna array, 0 for testbed
 //  Detector *detector=0; // builds antenna array, 0 for testbed
-  
 
 
-   
-   
 
 
-  
+
+
+
+
 //   TFile *AraFile=new TFile(( readfile ).c_str());
 //   //TFile *AraFile=new TFile((outputdir+"/AraOut.root").c_str());
 //   cout<<"AraFile"<<endl;
@@ -134,7 +134,7 @@ chain.GetEntry(0);
 //   AraTree2->SetBranchAddress("event",&event);
 //   AraTree2->SetBranchAddress("report",&report);
 //   cout<<"branch detector"<<endl;
-  
+
 //   AraTree->GetEvent(0);
 //   cout<<"getevent"<<endl;
 //   cout << "I'm here.\n";
@@ -260,7 +260,7 @@ chain.GetEntry(0);
           posnuY[nnu_pass] = event->Nu_Interaction[0].posnu.GetY();
           posnuR[nnu_pass] = event->Nu_Interaction[0].posnu.R();
           nnu_pass++;
-  
+
           cout<<"evt no "<<inu<<"stations[0].strings[1].antennas[2].ray_sol_cnt : "<<report->stations[0].strings[1].antennas[2].ray_sol_cnt<<endl;
           */
 
@@ -286,11 +286,11 @@ chain.GetEntry(0);
           //if (pass_evts == 1) {
           //if (pass_evts%50 == 0) {
 
-              TCanvas *cTest = new TCanvas ("cTest","", 3200,3200);
-              cTest->Divide(4,4);
+              TCanvas *cTest = new TCanvas ("cTest","", 3200,4200);
+              cTest->Divide(1,7);
 
               TGraph *gTest[16];
-              
+
               //for ( int chID=0; chID<16; chID++) {
               for ( int chID=0; chID<detector->stations[0].number_of_antennas; chID++) {
 
@@ -299,12 +299,12 @@ chain.GetEntry(0);
                   //cout<<"save wf for ch "<<chID<<" ";
                   //cout<<"string:"<<string<<" ant:"<<ant<<" type:"<<detector->stations[0].strings[string].antennas[ant].type<<" ";
                   //cout<<"DAQchan:"<<detector->stations[0].strings[string].antennas[ant].DAQchan<<endl;
-                  
-  				  
+
+
                   // plot waveform
                   double getx[bin];
                   double gety[bin];
-                  cout<<"Bin "<<bin<<endl; 
+                  cout<<"Bin "<<bin<<endl;
                   for (int l=0; l<bin; l++) {
 
   				  	  if (pass_evts > 500) continue;
@@ -313,14 +313,14 @@ chain.GetEntry(0);
                       //cout<<"getx["<<l<<"] : "<<getx[l]<<"\tgety["<<l<<"] : "<<gety[l]<<endl;
                       //myfile << getx[l]<< "   "<<gety[l]<<"    1"<<"\n";
 		      myfile <<gety[l]<<"   ";
-		      
+
                   }
 		  //		  cout<<" Bin "<<bin<<endl;
 		  if(pass_evts < 2 ) myfile <<"    1"<<"\n"; // 2 for signal, 1 for noise
-                  // gTest[chID] = new TGraph (bin, getx, gety);
+                   gTest[chID] = new TGraph (bin, getx, gety);
 
-                  // cTest->cd(chID+1);
-                  // gTest[chID]->Draw("AL");
+                   cTest->cd(chID+1);
+                   gTest[chID]->Draw("AL");
 
 
                   // // fill peak hist
@@ -330,16 +330,16 @@ chain.GetEntry(0);
                   // }
 
               }// for chID
-               
+
 
           //if (pass_evts%50 == 0) {
           //if (pass_evts% (total_evt/num_plots) == 0) {
-          // if (pass_evts < num_plots ) {
+           if (pass_evts < num_plots ) {
 
-          //         sstr.str("");
-          //         sstr<<"./outputs/plots/WF_AraOut.event"<<inu<<".pdf";
-          //         cTest->SaveAs(sstr.str().c_str());
-          // }
+                  sstr.str("");
+                  sstr<<"./outputs/plots/WF_AraOut.event"<<inu<<".pdf";
+                  cTest->SaveAs(sstr.str().c_str());
+          }
 
 
 
@@ -419,7 +419,7 @@ myfile.close();
     // sstr.str("");
     // sstr<<"./outputs/plots/Filters_AraOut.pdf";
     // cFilters->SaveAs(sstr.str().c_str());
-    
+
     // delete gfilter;
     // delete gpreamp;
     // delete gFOAM;
@@ -471,7 +471,7 @@ myfile.close();
     // sstr.str("");
     // sstr<<"./outputs/plots/Filters_databinsize_AraOut.pdf";
     // cFilters_DB->SaveAs(sstr.str().c_str());
-    
+
     // delete gfilter_DB;
     // delete gpreamp_DB;
     // delete gFOAM_DB;
@@ -479,7 +479,7 @@ myfile.close();
 
 
 
-  
+
 
 
     // TCanvas *cPeakV = new TCanvas ("cPeakV","", 3200,3200);
@@ -522,7 +522,7 @@ myfile.close();
 
 
 
-int getPeakBin(TGraph *gr) 
+int getPeakBin(TGraph *gr)
 {
   double x,y;
   gr->GetPoint(0,x,y);
@@ -533,7 +533,7 @@ int getPeakBin(TGraph *gr)
     if(peakVal<y) {
       peakVal=y;
       peakBin=i;
-    }      
+    }
   }
   return peakBin;
 }
@@ -549,12 +549,8 @@ double getPeak(TGraph *gr)
     if( peakVal<(y*y) ) {
       peakVal=(y*y);
       peakBin=i;
-    }      
+    }
   }
   //return peakBin;
   return sqrt(peakVal);
 }
-
-
-
-

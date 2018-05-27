@@ -89,6 +89,8 @@ class Antenna_r {
         vector <double> time;   // time of time domain Askaryan radiation
         vector <double> time_mimic;   // time of time domain Askaryan radiation (same time range with data)
         vector <double> V_mimic;    // signal + noise waveform which mimics the data (size : NFOUR/2 bin)
+        vector<double> waveformVoltage;
+
 
         int global_trig_bin; // from V_mimic [0, NFOUR/2] bins, where global trigger occured
 
@@ -140,7 +142,7 @@ class String_r {
                     //                                    1 : 1 or more antenna trg
 
         vector <Antenna_r> antennas;
-
+        double averageSNR;
         ClassDef(String_r,1);
 };
 
